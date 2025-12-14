@@ -204,7 +204,8 @@ def ev_human_two_dss(
 
 def compute_all_ev(
         Ps: float,
-        human_sensitivity: float,
+        source_1_sensitivity: float,
+        source_2_sensitivity: float,
         DSS1_sensitivity: float = None,
         DSS1_threshold: float = None,
         DSS2_sensitivity: float = None,
@@ -218,7 +219,8 @@ def compute_all_ev(
     If DSS thresholds are None, compute optimal thresholds automatically.
 
     :param Ps: prior probability of signal
-    :param human_sensitivity: human sensitivity (d')
+    :param source_1_sensitivity: source 1 sensitivity (d')
+    :param source_2_sensitivity: source 1 sensitivity (d')
     :param DSS1_sensitivity: DSS1 sensitivity (d'), optional
     :param DSS1_threshold: DSS1 decision threshold, optional
     :param DSS2_sensitivity: DSS2 sensitivity (d'), optional
@@ -229,6 +231,8 @@ def compute_all_ev(
     :return: dict with keys 'human_alone', 'human_one_dss', 'human_two_dss'
     """
     results = {}
+
+    human_sensitivity = combined_sensitivity(source_1_sensitivity, source_2_sensitivity)
 
     # 1️⃣ Human alone (no DSS)
     threshold_human_alone = compute_threshold(Ps, payoffs)
@@ -274,8 +278,8 @@ def compute_all_ev(
 
     return results
 
-print(compute_all_ev(Ps=0.2, human_sensitivity= 1.5, DSS1_sensitivity=1.5, DSS2_sensitivity=5,
-                     payoffs=Payoffs(V_TP=1, V_FP=-1, V_FN=-2, V_TN=1)))
+# print(compute_all_ev(Ps=0.2, human_sensitivity= 1.5, DSS1_sensitivity=1.5, DSS2_sensitivity=5,
+#                      payoffs=Payoffs(V_TP=1, V_FP=-1, V_FN=-2, V_TN=1)))
 
 
 # streamlit run ui/app.py

@@ -22,7 +22,8 @@ You can adjust **priors**, **sensitivities**, **payoffs**, and **DSS costs**, th
 st.sidebar.header("Simulation Parameters")
 
 Ps = st.sidebar.slider("Prior probability of signal (Ps)", 0.0, 1.0, 0.2)
-human_sensitivity = st.sidebar.slider("Human sensitivity (d')", 0.1, 5.0, 1.5)
+source_1_sensitivity = st.sidebar.slider("Sensitivity (d') source 1", 0.1, 5.0, 1.5)
+source_2_sensitivity = st.sidebar.slider("Sensitivity (d') source 2", 0.1, 5.0, 1.5)
 DSS1_sensitivity = st.sidebar.slider("DSS1 sensitivity (d')", 0.0, 5.0, 1.5)
 DSS2_sensitivity = st.sidebar.slider("DSS2 sensitivity (d')", 0.0, 5.0, 1.5)
 
@@ -46,7 +47,8 @@ if st.button("Compute Expected Values"):
 
     results = compute_all_ev(
         Ps=Ps,
-        human_sensitivity=human_sensitivity,
+        source_1_sensitivity=source_1_sensitivity,
+        source_2_sensitivity=source_2_sensitivity,
         DSS1_sensitivity=DSS1_sensitivity,
         DSS2_sensitivity=DSS2_sensitivity,
         payoffs=payoffs,
