@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-import pandas as pd
 import numpy as np
-from scipy.stats import norm
-import math
+from math import erf, sqrt
 
-import datetime
+def norm_cdf(x):
+    return 0.5 * (1 + erf(x / sqrt(2)))
+
 
 @dataclass
 class ClassificationProbabilities:
@@ -58,8 +58,8 @@ def compute_probs(sensitivity: float, threshold: float) -> ClassificationProbabi
 
     z_tp = float((sensitivity**2 - 2*np.log(threshold))/(2*sensitivity))
     z_fp = -1 * float((sensitivity**2 + 2*np.log(threshold))/(2*sensitivity))
-    ptp = norm.cdf(z_tp)
-    pfp = norm.cdf(z_fp)
+    ptp = norm_cdf(z_tp)
+    pfp = norm_cdf(z_fp)
     pfn = 1 - ptp
     ptn = 1- pfp
     return ClassificationProbabilities(ptp=ptp, pfp=pfp, pfn=pfn, ptn=ptn)
