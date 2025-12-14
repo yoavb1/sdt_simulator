@@ -6,9 +6,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-
 from core.sdt import Payoffs, compute_all_ev
 
 st.set_page_config(page_title="SDT Human + DSS Simulation", layout="wide")
@@ -62,28 +59,3 @@ if st.button("Compute Expected Values"):
     ev_df = pd.DataFrame([results]).T.reset_index()
     ev_df.columns = ["Scenario", "Expected Value"]
     st.table(ev_df)
-
-    # # Optional: Plot EV vs Human Sensitivity
-    # st.subheader("EV vs Human Sensitivity (for current DSS settings)")
-    # human_sens_range = np.linspace(0.1, 3.0, 30)
-    # ev_two_dss_values = [
-    #     compute_all_ev(
-    #         Ps=Ps,
-    #         human_sensitivity=s,
-    #         DSS1_sensitivity=DSS1_sensitivity,
-    #         DSS2_sensitivity=DSS2_sensitivity,
-    #         payoffs=payoffs,
-    #         DSS1_cost=DSS1_cost,
-    #         DSS2_cost=DSS2_cost
-    #     )['human_two_dss']
-    #     for s in human_sens_range
-    # ]
-
-    # fig, ax = plt.subplots()
-    # ax.plot(human_sens_range, ev_two_dss_values, marker='o', label="EV Human + 2 DSS")
-    # ax.set_xlabel("Human Sensitivity (d')")
-    # ax.set_ylabel("Expected Value")
-    # ax.set_title("EV vs Human Sensitivity")
-    # ax.legend()
-    # ax.grid(True)
-    # st.pyplot(fig)
