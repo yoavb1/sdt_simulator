@@ -278,8 +278,4 @@ def compute_all_ev(
 
     return results
 
-# print(compute_all_ev(Ps=0.2, human_sensitivity= 1.5, DSS1_sensitivity=1.5, DSS2_sensitivity=5,
-#                      payoffs=Payoffs(V_TP=1, V_FP=-1, V_FN=-2, V_TN=1)))
-
-
 # streamlit run ui/app.py
