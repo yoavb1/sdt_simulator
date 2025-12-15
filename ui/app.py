@@ -128,31 +128,73 @@ elif mode == "Compute Expected Values":
 else:
     st.subheader("📈 Expected Value as a Function of a Model Parameter")
 
+    PARAM_SPECS = {
+        "Prior probability (Ps)": {
+            "key": "Ps",
+            "min": 0.01,
+            "max": 0.99,
+            "default": (0.05, 0.95),
+            "step_default": 0.01
+        },
+        "Temperature sensitivity": {
+            "key": "source_1_sensitivity",
+            "min": 0.5,
+            "max": 5.0,
+            "default": (0.5, 3.0),
+            "step_default": 0.1
+        },
+        "Humidity sensitivity": {
+            "key": "source_2_sensitivity",
+            "min": 0.5,
+            "max": 5.0,
+            "default": (0.5, 3.0),
+            "step_default": 0.1
+        },
+        "System 1 sensitivity": {
+            "key": "DSS1_sensitivity",
+            "min": 0.5,
+            "max": 5.0,
+            "default": (0.5, 3.0),
+            "step_default": 0.1
+        },
+        "System 2 sensitivity": {
+            "key": "DSS2_sensitivity",
+            "min": 0.5,
+            "max": 5.0,
+            "default": (0.5, 3.0),
+            "step_default": 0.1
+        },
+    }
+
     parameter = st.selectbox(
         "Select parameter to vary",
-        [
-            "Prior probability (Ps)",
-            "Temperature sensitivity",
-            "Humidity sensitivity",
-            "System 1 sensitivity",
-            "System 2 sensitivity",
-        ]
+        list(PARAM_SPECS.keys())
     )
+
+    spec = PARAM_SPECS[parameter]
 
     x_min, x_max = st.slider(
         "Parameter range",
-        0.0, 5.0, (0.1, 3.0), 0.05
+        min_value=spec["min"],
+        max_value=spec["max"],
+        value=spec["default"]
     )
 
-    n_points = st.slider("Number of points", 10, 200, 50)
+    step = st.slider(
+        "Step size",
+        min_value=spec["step_default"] / 10,
+        max_value=spec["step_default"] * 5,
+        value=spec["step_default"]
+    )
 
-    if st.sidebar.button("Generate Plot"):
+    # Step-based grid (correct)
+    grid = np.arange(x_min, x_max + step, step)
 
-        grid = np.linspace(x_min, x_max, n_points)
+    if st.button("Generate Plot"):
+
         records = []
 
         for x in grid:
-
             params = dict(
                 Ps=Ps,
                 source_1_sensitivity=source_1_sensitivity,
@@ -164,17 +206,8 @@ else:
                 DSS2_cost=DSS2_cost
             )
 
-            # Override selected parameter
-            if parameter == "Prior probability (Ps)":
-                params["Ps"] = x
-            elif parameter == "Temperature sensitivity":
-                params["source_1_sensitivity"] = x
-            elif parameter == "Humidity sensitivity":
-                params["source_2_sensitivity"] = x
-            elif parameter == "System 1 sensitivity":
-                params["DSS1_sensitivity"] = x
-            elif parameter == "System 2 sensitivity":
-                params["DSS2_sensitivity"] = x
+            # Override the selected parameter (clean & generic)
+            params[spec["key"]] = float(x)
 
             results = compute_all_ev(**params)
 
