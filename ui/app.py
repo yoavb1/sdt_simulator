@@ -33,7 +33,7 @@ st.sidebar.header("Simulation Mode")
 
 mode = st.sidebar.radio(
     "Select functionality",
-    ["Compute Expected Values", "Plot EV vs Parameter"]
+    ["Compute Expected Values", "Plot EV vs Parameter", "Plot EV vs 2 Parameters"]
 )
 
 # -------------------------------------------------
@@ -125,7 +125,7 @@ elif mode == "Compute Expected Values":
 # =================================================
 # MODE 2 — Plot EV vs selected parameter
 # =================================================
-else:
+elif mode == "Plot EV vs Parameter":
     st.subheader("📈 Expected Value as a Function of a Model Parameter")
 
     PARAM_SPECS = {
@@ -233,3 +233,97 @@ else:
         Each curve shows how the expected value of a decision strategy changes
         as the selected parameter varies, while all other parameters are held constant.
         """)
+
+
+# =================================================
+# MODE 3 — 3D Surface EV vs two parameters
+# =================================================
+elif mode == "Plot EV vs 2 Parameters":
+    st.subheader("📊 3D Expected Value Surface")
+
+    param_options = [
+        "Prior probability (Ps)",
+        "Temperature sensitivity",
+        "Humidity sensitivity",
+        "System 1 sensitivity",
+        "System 2 sensitivity"
+    ]
+
+    param_x = st.selectbox("Select X-axis parameter", param_options, key="x3d")
+    param_y = st.selectbox("Select Y-axis parameter", [p for p in param_options if p != param_x], key="y3d")
+
+    # Define parameter specs as before
+    PARAM_SPECS = {
+        "Prior probability (Ps)": {"key": "Ps", "min": 0.01, "max": 0.99, "step": 0.01},
+        "Temperature sensitivity": {"key": "source_1_sensitivity", "min": 0.5, "max": 5.0, "step": 0.1},
+        "Humidity sensitivity": {"key": "source_2_sensitivity", "min": 0.5, "max": 5.0, "step": 0.1},
+        "System 1 sensitivity": {"key": "DSS1_sensitivity", "min": 0.5, "max": 5.0, "step": 0.1},
+        "System 2 sensitivity": {"key": "DSS2_sensitivity", "min": 0.5, "max": 5.0, "step": 0.1},
+    }
+
+    # Ranges for X and Y
+    x_min, x_max = st.slider(
+        f"Range for {param_x}",
+        PARAM_SPECS[param_x]["min"],
+        PARAM_SPECS[param_x]["max"],
+        (PARAM_SPECS[param_x]["min"], PARAM_SPECS[param_x]["max"]),
+        step=PARAM_SPECS[param_x]["step"]
+    )
+
+    y_min, y_max = st.slider(
+        f"Range for {param_y}",
+        PARAM_SPECS[param_y]["min"],
+        PARAM_SPECS[param_y]["max"],
+        (PARAM_SPECS[param_y]["min"], PARAM_SPECS[param_y]["max"]),
+        step=PARAM_SPECS[param_y]["step"]
+    )
+
+    step_x = PARAM_SPECS[param_x]["step"]
+    step_y = PARAM_SPECS[param_y]["step"]
+
+    if st.button("Generate 3D Surface"):
+
+        x_grid = np.arange(x_min, x_max + step_x, step_x)
+        y_grid = np.arange(y_min, y_max + step_y, step_y)
+        X, Y = np.meshgrid(x_grid, y_grid)
+
+        # Initialize Z grid for a selected scenario (let's pick "Human only" as default)
+        Z = np.zeros_like(X)
+
+        for i in range(len(y_grid)):
+            for j in range(len(x_grid)):
+                # Current parameter values
+                params = {
+                    "Ps": Ps,
+                    "source_1_sensitivity": source_1_sensitivity,
+                    "source_2_sensitivity": source_2_sensitivity,
+                    "DSS1_sensitivity": DSS1_sensitivity,
+                    "DSS2_sensitivity": DSS2_sensitivity,
+                    "payoffs": payoffs,
+                    "DSS1_cost": DSS1_cost,
+                    "DSS2_cost": DSS2_cost
+                }
+
+                # Override selected parameters
+                params[PARAM_SPECS[param_x]["key"]] = x_grid[j]
+                params[PARAM_SPECS[param_y]["key"]] = y_grid[i]
+
+                result = compute_all_ev(**params)
+                # Example: plot first scenario (you can add selection if needed)
+                Z[i, j] = list(result.values())[0]
+
+        # Plot
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_subplot(111, projection="3d")
+        surf = ax.plot_surface(X, Y, Z, cmap="viridis", edgecolor="none")
+
+        ax.set_xlabel(param_x)
+        ax.set_ylabel(param_y)
+        ax.set_zlabel("Expected Value")
+        ax.set_title("3D Expected Value Surface")
+        fig.colorbar(surf, shrink=0.5, aspect=10)
+
+        st.pyplot(fig)
