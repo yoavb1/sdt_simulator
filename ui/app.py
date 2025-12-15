@@ -41,22 +41,22 @@ mode = st.sidebar.radio(
 # -------------------------------------------------
 st.sidebar.header("Simulation Parameters")
 
-Ps = st.sidebar.slider("Prior probability to failure (Ps)", 0.0, 1.0, 0.2, 0.01)
+Ps = st.sidebar.slider("Prior probability to failure (Ps)", 0.01, 1.0, 0.2, 0.01)
 
 source_1_sensitivity = st.sidebar.slider(
-    "Temperature sensitivity", 0.1, 5.0, 1.5, 0.1
+    "Temperature sensitivity", 0.5, 5.0, 1.5, 0.1
 )
 
 source_2_sensitivity = st.sidebar.slider(
-    "Humidity sensitivity", 0.1, 5.0, 1.5, 0.1
+    "Humidity sensitivity", 0.5, 5.0, 1.5, 0.1
 )
 
 DSS1_sensitivity = st.sidebar.slider(
-    "System 1 sensitivity", 0.0, 5.0, 1.5, 0.1
+    "System 1 sensitivity", 0.5, 5.0, 1.5, 0.1
 )
 
 DSS2_sensitivity = st.sidebar.slider(
-    "System 2 sensitivity", 0.0, 5.0, 1.5, 0.1
+    "System 2 sensitivity", 0.5, 5.0, 1.5, 0.1
 )
 
 # -------------------------------------------------
