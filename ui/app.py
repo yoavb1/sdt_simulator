@@ -69,6 +69,13 @@ with st.sidebar.expander("💰 Payoffs", expanded=False):
     V_TN = st.number_input("True Negative", value=1)
 
 payoffs = Payoffs(V_TP=V_TP, V_FP=V_FP, V_FN=V_FN, V_TN=V_TN)
+invalid_payoff = (V_FN - V_TP) == 0
+
+if invalid_payoff:
+    st.sidebar.error("⚠️ Invalid payoffs: V_FN - V_TP cannot be 0.")
+    compute_disabled = True
+else:
+    compute_disabled = False
 
 # -------------------------------------------------
 # Costs
@@ -80,7 +87,11 @@ with st.sidebar.expander("💸 System Costs", expanded=False):
 # =================================================
 # MODE 1 — Single-point EV
 # =================================================
-if mode == "Compute Expected Values":
+if compute_disabled:
+    st.markdown("""
+    **Payoffs ratio denominator can not be 0**  
+    """)
+elif mode == "Compute Expected Values":
 
     if st.sidebar.button("Compute Expected Values"):
 
